@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>真實鏡像｜做自己探索系統</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #0c0c0e;
+            color: #a1a1aa;
+            transition: background-color 3s ease;
+        }
+        
+        /* V3 意識流溶解過渡：徹底物理移除 Stage 結構 */
+        .state-layer {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1), transform 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(10px);
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 0;
+        }
+        .state-active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            position: relative;
+        }
+
+        /* V3 侵入式意識回聲（打破使用者主控錯覺） */
+        .intrusive-echo {
+            position: absolute;
+            color: #61616a;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            font-style: italic;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            filter: blur(4px);
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .echo-visible {
+            opacity: 0.75;
+            filter: blur(0);
+        }
+
+        /* 面具與非線性游標停頓裂痕 */
+        .mask-container {
+            position: relative;
+            width: 120px;
+            height: 160px;
+            perspective: 1000px;
+        }
+        .mask-svg {
+            width: 100%;
+            height: 100%;
+            transition: all 2s ease;
+        }
+        .crack-line {
+            stroke: #7f1d1d;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            transition: stroke-dashoffset 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: none;
+        }
+        .shatter {
+            transform: scale(1.4) rotate(1deg);
+            opacity: 0;
+            filter: blur(15px);
+            pointer-events: none;
+        }
+        
+        /* 鏡面框倒影質感 */
+        .mirror-surface {
+            background: linear-gradient(135deg, #121214 0%, #1c1c1f 50%, #0f0f11 100%);
+            border: 1px solid #27272a;
+            box-shadow: inset 0 0 40px rgba(255,255,255,0.01), 0 30px 60px rgba(0,0,0,0.8);
+        }
+        
+        /* 極簡輸入框 */
+        input[type="text"] {
+            background-color: rgba(9, 9, 11, 0.8);
+            border: 1px solid #1e1e24;
+            transition: all 0.8s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #3f3f46;
+            box-shadow: 0 0 20px rgba(255,255,255,0.01);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-8 antialiased overflow-x-hidden select-none">
+
+    <div id="intrusive-echo-container" class="absolute inset-0 pointer-events-none overflow-hidden z-index: 40;"></div>
+
+    <div id="system-box" class="w-full max-w-md bg-zinc-950/10 border border-zinc-900/40 rounded-3xl p-6 md:p-12 transition-all duration-1500 relative">
+        
+        <div id="master-text" class="hidden absolute top-4 left-0 right-0 text-center text-zinc-800 font-light text-[9px] tracking-widest uppercase">
+            你現在活出的，真的是你嗎？
+        </div>
+
+        <div id="visual-center" class="hidden justify-center mb-8 opacity-40">
+            <div class="mask-container" id="mask-stage">
+                <svg class="mask-svg" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 10 C20 10 15 40 15 70 C15 100 35 115 50 115 C65 115 85 100 85 70 C85 40 80 10 50 10 Z" stroke="#27272a" stroke-width="1.2" id="mask-base"/>
+                    <path d="M50 10 Q42 35 32 45" class="crack-line" id="crack-1"/>
+                    <path d="M85 70 Q60 72 50 90" class="crack-line" id="crack-2"/>
+                    <path d="M15 70 Q38 78 50 90" class="crack-line" id="crack-3"/>
+                </svg>
+            </div>
+        </div>
+
+        <div id="state-canvas" class="relative min-h-[260px]">
+
+            <div id="state-layer-1" class="state-layer state-active space-y-12 text-center py-12">
+                <h1 class="text-2xl font-light tracking-widest text-zinc-300">你真的了解自己嗎？</h1>
+                <div>
+                    <button onclick="transitionTo(2)" class="bg-zinc-300 hover:bg-white text-zinc-950 font-medium tracking-widest px-12 py-3.5 rounded-full transition-all transform hover:scale(105 cursor-pointer text-xs">
+                        開始探索
+                    </button>
+                </div>
+            </div>
+
+            <div id="state-layer-2" class="state-layer space-y-6">
+                <div class="space-y-5 text-sm text-zinc-400 max-w-sm mx-auto">
+                    <div class="space-y-2 relative" id="wrapper-desire">
+                        <label class="text-zinc-400 block font-light text-xs tracking-wide">如果不用考慮任何人的感受，你目前最想追求、最想做的是什麼？</label>
+                        <input type="text" id="lab-desire" placeholder="..." class="w-full p-3.5 rounded-xl focus:outline-none text-zinc-200 text-xs">
+                    </div>
+                    <div class="space-y-2 pt-2 relative" id="wrapper-fear">
+                        <label class="text-zinc-400 block font-light text-xs tracking-wide">為了維持現在的生活，你內心最害怕失去、最恐懼的是什麼？</label>
+                        <input type="text" id="lab-fear" placeholder="..." class="w-full p-3.5 rounded-xl focus:outline-none text-zinc-200 text-xs">
+                    </div>
+                </div>
+                <div class="text-center pt-4">
+                    <button id="btn-state-2" onclick="transitionTo(3)" class="bg-zinc-900 text-zinc-500 px-10 py-2.5 rounded-full text-xs tracking-widest border border-zinc-900 cursor-pointer transition-all">繼續</button>
+                </div>
+            </div>
+
+            <div id="state-layer-3" class="state-layer space-y-5 text-sm text-zinc-400 max-w-sm mx-auto">
+                <div class="space-y-2 relative" id="wrapper-parents">
+                    <label class="text-zinc-400 block font-light text-xs tracking-wide">和【父母】相處時，你最常隱藏的是什麼？</label>
+                    <input type="text" id="write-parents" placeholder="..." class="w-full p-3.5 rounded-xl focus:outline-none text-zinc-200 text-xs">
+                </div>
+                <div class="space-y-2 pt-1 relative" id="wrapper-boss">
+                    <label class="text-zinc-400 block font-light text-xs tracking-wide">和【主管】相處時，你最不敢說出口的是什麼？</label>
+                    <input type="text" id="write-boss" placeholder="..." class="w-full p-3.5 rounded-xl focus:outline-none text-zinc-200 text-xs">
+                </div>
+                <div class="space-y-2 pt-1 relative" id="wrapper-partner">
+                    <label class="text-zinc-400 block font-light text-xs tracking-wide">和【伴侶】相處時，你最害怕被看見的是什麼？</label>
+                    <input type="text" id="write-partner" placeholder="..." class="w-full p-3.5 rounded-xl focus:outline-none text-zinc-200 text-xs">
+                </div>
+                <div class="text-center pt-4">
+                    <button id="btn-state-3" onclick="transitionTo(4)" class="bg-zinc-900 text-zinc-500 px-10 py-2.5 rounded-full text-xs tracking-widest border border-zinc-900 cursor-pointer transition-all">繼續</button>
+                </div>
+            </div>
+
+            <div id="state-layer-4" class="state-layer space-y-6">
+                <div class="text-center py-1">
+                    <p class="text-zinc-400 text-xs font-light tracking-widest uppercase">哪一個歷史階段的你，最不像自己？</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-xs text-zinc-500 max-w-sm mx-auto">
+                    <label class="flex items-center gap-3 p-4 bg-zinc-950/40 border border-zinc-900 rounded-xl cursor-pointer hover:bg-zinc-800/40 transition-all"><input type="radio" name="time-history" value="0-12 歲的童年期" checked class="accent-zinc-600"> 👦 0-12 歲</label>
+                    <label class="flex items-center gap-3 p-4 bg-zinc-950/40 border border-zinc-900 rounded-xl cursor-pointer hover:bg-zinc-800/40 transition-all"><input type="radio" name="time-history" value="13-18 歲的青春期" class="accent-zinc-600"> 🎒 13-18 歲</label>
+                    <label class="flex items-center gap-3 p-4 bg-zinc-950/40 border border-zinc-900 rounded-xl cursor-pointer hover:bg-zinc-800/40 transition-all"><input type="radio" name="time-history" value="19-30 歲的探索期" class="accent-zinc-600"> 💼 19-30 歲</label>
+                    <label class="flex items-center gap-3 p-4 bg-zinc-950/40 border border-zinc-900 rounded-xl cursor-pointer hover:bg-zinc-800/40 transition-all"><input type="radio" name="time-history" value="31 歲以後的成熟期" class="accent-zinc-600"> ⏳ 31 歲以後</label>
+                </div>
+                <div class="text-center pt-4">
+                    <button id="btn-state-4" onclick="transitionTo(5)" class="bg-zinc-800 text-zinc-400 px-10 py-2.5 rounded-full text-xs font-bold border border-zinc-700 cursor-pointer transition-all">解鎖鏡像</button>
+                </div>
+            </div>
+
+            <div id="state-layer-5" class="state-layer space-y-6 text-center py-12">
+                <div id="typewriter-canvas" class="text-zinc-400 font-light text-sm md:text-base tracking-widest leading-relaxed max-w-xs mx-auto h-12"></div>
+                <div id="silence-unlock-trigger" class="pt-6 opacity-0 transition-opacity duration-1500">
+                    <button onclick="triggerShatterEngine()" class="text-zinc-600 hover:text-zinc-400 text-[10px] tracking-widest underline cursor-pointer">（直面內心後，點擊解鎖鏡像）</button>
+                </div>
+            </div>
+
+            <div id="state-layer-6" class="state-layer space-y-6 text-zinc-400">
+                <div id="share-card-area" class="mirror-surface rounded-2xl p-6 md:p-8 space-y-5">
+                    <div class="text-center border-b border-zinc-900 pb-4">
+                        <h2 class="text-lg font-light tracking-widest text-zinc-300">《真實鏡像報告》</h2>
+                        <p class="text-zinc-600 text-[8px] font-mono tracking-widest mt-1">THE TRUE MIRROR // INDEPENDENT AUDIT</p>
+                    </div>
+
+                    <div class="space-y-4 text-xs md:text-sm leading-relaxed border-b border-zinc-900 pb-4">
+                        <p class="text-zinc-500">你寫下你最害怕失去：<br><span class="text-amber-800 font-medium text-sm md:text-base">「<span id="mir-fear"></span>」</span></p>
+                        <p class="text-zinc-500">但你同時渴望追求：<br><span class="text-zinc-300 font-medium text-sm md:text-base">「<span id="mir-desire"></span>」</span></p>
+                        
+                        <div class="h-px bg-zinc-900/60 my-2"></div>
+                        <p class="text-zinc-400 text-xs bg-zinc-950/50 p-4 rounded-xl border border-zinc-900/80 leading-relaxed" id="v3-echo-insight">
+                            </p>
+                    </div>
+
+                    <div class="space-y-2 bg-zinc-950/30 p-4 rounded-xl border border-zinc-900 text-[11px]" id="mirror-data-box"></div>
+
+                    <div class="bg-zinc-950/60 p-4 rounded-xl border border-zinc-900 space-y-3">
+                        <label class="block text-[11px] font-medium text-zinc-400 leading-relaxed">
+                            🔮 如果一年後，你真的破除了這些枷鎖、活成更真實的自己。<br>那時候的你，會想對今天的自己說些什麼？
+                        </label>
+                        <input type="text" id="future-words" placeholder="留下你想對今天自己說的話..." class="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:outline-none focus:border-zinc-700 text-zinc-300 text-xs transition-all">
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2 justify-center text-[11px] pt-1">
+                    <button onclick="window.print()" class="bg-zinc-900 text-zinc-500 py-3 px-6 rounded-full font-medium hover:bg-zinc-800 hover:text-zinc-300 cursor-pointer transition-all">🖨️ 輸出 PDF 鏡像</button>
+                    <button onclick="submitV3Commitment()" class="bg-amber-900 text-white py-3 px-8 rounded-full font-bold hover:bg-amber-800 cursor-pointer shadow-md transition-all tracking-wider">✨ 留下承諾並進入下一層</button>
+                </div>
+            </div>
+
+            <div id="state-layer-7" class="state-layer space-y-6 text-zinc-500 text-center max-w-xs mx-auto py-6">
+                <div class="space-y-4 leading-relaxed text-xs md:text-sm">
+                    <div class="text-[9px] text-zinc-700 font-mono tracking-widest uppercase">AFTERSHOCK // 餘波</div>
+                    <p class="text-zinc-400">
+                        你剛完成的，不是測驗。而是一面鏡子。
+                    </p>
+                    <p class="text-zinc-500">
+                        在這場鏡像之後，有些人會開始重讀一本書。<br>他們說，那本書並沒有回答問題，只是在描述他們已經知道的事。
+                    </p>
+                </div>
+
+                <div class="bg-zinc-950/40 border border-zinc-900 rounded-2xl p-5 space-y-1">
+                    <h3 class="text-base font-medium text-zinc-300">《做自己》</h3>
+                    <p class="text-zinc-600 text-[10px]">作者：陳海倫 ‧ 創意出版社</p>
+                </div>
+
+                <div class="flex gap-3 justify-center pt-4 text-xs">
+                    <a href="https://pia640210.github.io/be-yourself/" target="_blank" class="bg-zinc-300 hover:bg-white text-zinc-950 font-bold px-10 py-3.5 rounded-full tracking-widest cursor-pointer transition-all shadow-lg">
+                        進入下一層
+                    </a>
+                    <a href="https://pia640210.github.io/be-yourself/" target="_blank" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-500 px-8 py-3.5 rounded-full tracking-widest cursor-pointer border border-zinc-800 transition-all">
+                        如果你還沒離開
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let totalDwellSec = 0;
+        let startTimestamp = 0;
+        let userActionLog = { timeGapState2: 0, timeGapState3: 0 };
+        
+        const intrusiveEchoText = [
+            "「你選擇了自由，但你也仍在維持某種秩序。」",
+            "「隱藏的背後，往往藏著『不被愛』的深層恐懼。」",
+            "「面具長出來的那一年，你其實只是為了保護自己。」",
+            "「你正在用快速的填寫，來試圖逃避視線嗎？」"
+        ];
+
+        function startV3Engine() {
+            startTimestamp = Date.now();
+            document.body.addEventListener('mousemove', debounceCheckCracks, false);
+        }
+
+        function transitionTo(nextState) {
+            const currentLayerNum = nextState - 1;
+            const currentBtn = document.getElementById(`btn-state-${currentLayerNum}`);
+            if (currentBtn) {
+                currentBtn.disabled = true;
+                currentBtn.style.opacity = '0.3';
+            }
+
+            deployIntrusiveEcho(currentLayerNum);
+
+            if (currentLayerNum === 2) userActionLog.timeGapState2 = Math.floor((Date.now() - startTimestamp) / 1000);
+            if (currentLayerNum === 3) userActionLog.timeGapState3 = Math.floor((Date.now() - startTimestamp) / 1000) - userActionLog.timeGapState2;
+
+            const compressedDelay = 1200 + Math.random() * 1500;
+            
+            setTimeout(() => {
+                document.getElementById(`state-layer-${currentLayerNum}`).classList.remove('state-active');
+                
+                if (nextState === 2) {
+                    startV3Engine();
+                    document.getElementById('visual-center').classList.remove('hidden');
+                    document.getElementById('visual-center').classList.add('flex');
+                    document.getElementById('master-text').classList.remove('hidden');
+                }
+                
+                if (nextState === 5) {
+                    totalDwellSec = Math.floor((Date.now() - startTimestamp) / 1000);
+                    document.getElementById('visual-center').classList.add('hidden');
+                    runSilenceRitual();
+                } else {
+                    document.getElementById(`state-layer-${nextState}`).classList.add('state-active');
+                }
+            }, compressedDelay);
+        }
+
+        function deployIntrusiveEcho(stage) {
+            if (stage < 2 || stage > 4) return;
+            const container = document.getElementById('intrusive-echo-container');
+            const echoEl = document.createElement('div');
+            echoEl.className = "intrusive-echo";
+            echoEl.innerText = intrusiveEchoText[stage - 2];
+            
+            const targets = stage === 2 ? ['#wrapper-desire', '#wrapper-fear'] : ['#wrapper-parents', '#wrapper-boss', '#wrapper-partner'];
+            const randomTarget = document.querySelector(targets[Math.floor(Math.random() * targets.length)]);
+            
+            if (randomTarget) {
+                const rect = randomTarget.getBoundingClientRect();
+                echoEl.style.left = `${rect.left + (Math.random() * 20)}px`;
+                echoEl.style.top = `${rect.top + (rect.height / 3)}px`;
+            } else {
+                echoEl.style.left = `${30 + Math.random() * 40}%`;
+                echoEl.style.top = `${40 + Math.random() * 30}%`;
+            }
+
+            container.appendChild(echoEl);
+            setTimeout(() => echoEl.classList.add('echo-visible'), 100);
+
+            const residualDuration = 3000 + Math.random() * 2000;
+            setTimeout(() => {
+                echoEl.classList.remove('echo-visible');
+                setTimeout(() => echoEl.remove(), 1500);
+            }, residualDuration);
+        }
+
+        let debounceTimer;
+        function debounceCheckCracks() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(calculateCracksModel, 300);
+        }
+
+        function calculateCracksModel() {
+            let crackWeight = 0;
+            if (document.getElementById('lab-desire').value.trim().length > 5) crackWeight += 2;
+            if (document.getElementById('lab-fear').value.trim().length > 5) crackWeight += 2;
+            if (document.getElementById('write-parents').value?.trim().length > 2) crackWeight++;
+            if (document.getElementById('write-boss').value?.trim().length > 2) crackWeight++;
+            if (document.getElementById('write-partner').value?.trim().length > 2) crackWeight++;
+
+            if (Math.random() < 0.25) crackWeight += 2; 
+
+            if (crackWeight >= 2) breakMaskLine(1);
+            if (crackWeight >= 4) breakMaskLine(2);
+            if (crackWeight >= 6) breakMaskLine(3);
+        }
+
+        function breakMaskLine(id) {
+            const crack = document.getElementById(`crack-${id}`);
+            if (crack && crack.style.display !== 'block') {
+                crack.style.display = 'block';
+                setTimeout(() => crack.style.strokeDashoffset = '0', 50);
+            }
+        }
+
+        function runSilenceRitual() {
+            document.body.style.backgroundColor = "#060608";
+            document.getElementById('system-box').style.borderColor = "#121214";
+            document.getElementById('state-layer-5').classList.add('state-active');
+
+            const text = "你有多久沒有問過自己：你真正想要什麼？";
+            executeTypewriter(text, 'typewriter-canvas', 0, 120);
+
+            setTimeout(() => {
+                const trigger = document.getElementById('silence-unlock-trigger');
+                trigger.classList.remove('opacity-0');
+                trigger.classList.add('opacity-100');
+            }, 5500);
+        }
+
+        function executeTypewriter(text, canvasId, idx, speed) {
+            const el = document.getElementById(canvasId);
+            if (el && idx < text.length) {
+                el.innerHTML += text.charAt(idx);
+                setTimeout(() => executeTypewriter(text, canvasId, idx + 1, speed), speed);
+            }
+        }
+
+        function triggerShatterEngine() {
+            document.getElementById('visual-center').classList.remove('hidden');
+            document.getElementById('visual-center').classList.add('flex');
+            document.getElementById('mask-stage').classList.add('shatter');
+
+            setTimeout(() => {
+                document.getElementById('state-layer-5').classList.remove('state-active');
+                document.getElementById('visual-center').classList.add('hidden');
+                document.body.style.backgroundColor = "#0c0c0e";
+                renderV3MirrorReport();
+            }, 1200);
+        }
+
+        function renderV3MirrorReport() {
+            document.getElementById('state-layer-6').classList.add('state-active');
+
+            const labData = JSON.parse(localStorage.getItem('true_mirror_final_lab')) || { desire: "未填寫", fear: "未填寫" };
+            const historyStage = document.querySelector('input[name="time-history"]:checked').value;
+            
+            const rParents = document.getElementById('write-parents').value || "未填寫";
+            const rBoss = document.getElementById('write-boss').value || "未填寫";
+            const rPartner = document.getElementById('write-partner').value || "未填寫";
+
+            document.getElementById('mir-fear').innerText = labData.fear;
+            document.getElementById('mir-desire').innerText = labData.desire;
+
+            const insightBox = document.getElementById('v3-echo-insight');
+            if (userActionLog.timeGapState2 < 15) {
+                insightBox.innerHTML = `「你其實並不想在這裡停留。面對最初的核心拉扯，你選擇了用不到 15 秒的時間快速逃離、將答案關閉。你習慣用這種高效率的配合，來掩飾自己在面對恐懼時內心的不安全感。這面鏡子不替你解釋人生，看清這場拉扯，答案只有你明白。」`;
+            } else if (userActionLog.timeGapState3 > 40) {
+                insightBox.innerHTML = `「你在整理日常人際關係的隱藏時，產生了極高強度的停頓與審視。你在文字裡留下了深深的重力，這說明你早已在這些環境中活得疲憊不堪。你不是不知道自己要什麼，你只是在害怕承擔放手後的代價。答案就在你心裡。」`;
+            } else {
+                insightBox.innerHTML = `「你完成了一場對自我的注視。你親筆寫下的恐懼與你所追求的渴望，兩者正精準地存在於天秤的兩端。這場對撞至今仍以體感的形式在拉扯著你。鏡子不會說話，它只負責映照。那條解鎖的鑰匙，一直握在你自己的手裡。」`;
+            }
+
+            document.getElementById('mirror-data-box').innerHTML = `
+                <p class="mb-1">• 外部偽裝在生命中的起源點 ➔ <span class="text-zinc-300 font-medium">${historyStage}</span></p>
+                <p class="mb-1">• 面對父母時，你選擇隱藏了 ➔ <span class="text-zinc-300 font-medium">「${rParents}」</span></p>
+                <p class="mb-1">• 面對主管時，你最不敢說出口的 ➔ <span class="text-zinc-300 font-medium">「${rBoss}」</span></p>
+                <p class="mb-1">• 面對伴侶時，你最深恐被看見的 ➔ <span class="text-zinc-300 font-medium">「${rPartner}」</span></p>
+            `;
+        }
+
+        function submitV3Commitment() {
+            const commit = document.getElementById('future-words').value;
+            if(!commit) {
+                alert("請試著寫下一句，一年後的自己想對今天說的話。");
+                return;
+            }
+            document.getElementById('state-layer-6').classList.remove('state-active');
+            document.getElementById('state-layer-7').classList.add('state-active');
+        }
+    </script>
+</body>
+</html>
