@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>真實鏡像｜你現在活出的，真的是你嗎？</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4">
+// ── 試閱展開 ──
+function toggleExcerpt(){
+  const more = document.getElementById('excerpt-more');
+  const btn  = document.getElementById('excerpt-btn');
+  const open = more.style.display === 'none';
+  more.style.display = open ? 'block' : 'none';
+  btn.innerText = open ? '收起試閱 ↑' : '閱讀更多試閱 ↓';
+}
+
 // ── 語音輸入（Web Speech API）──
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recog = null;
@@ -27,8 +36,14 @@ function voice(id, btn){
     input.value = base + txt;
   };
   recog.onerror = ev => {
-    if(ev.error === 'not-allowed')
-      alert('請允許麥克風權限後再試一次。');
+    btn.classList.remove('rec');
+    if(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){
+      alert('無法取得麥克風權限。\n若你正使用 LINE 或 FB 內建瀏覽器，請點右上角選單，改用 Safari / Chrome 開啟本頁後再試。');
+    } else if(ev.error === 'no-speech'){
+      // 沒收到聲音，靜默結束即可
+    } else {
+      alert('語音輸入暫時無法使用，請改用打字輸入。');
+    }
   };
   recog.onend = () => {
     btn.classList.remove('rec');
@@ -274,9 +289,20 @@ input[type=text]::placeholder { color: #6e6e78; }
         你現在活出的，<br>真的是你嗎？
       </h1>
 
-      <p style="font-size:15px;color:var(--t3);letter-spacing:.05em;margin-bottom:28px">
+      <p style="font-size:15px;color:var(--t3);letter-spacing:.05em;margin-bottom:24px">
         這不是測驗。這是一面鏡子。
       </p>
+
+      <!-- 書籍定位：讓人第一秒就知道這是《做自己》的延伸體驗 -->
+      <div class="book-line" style="max-width:300px;margin:0 auto 28px;text-align:left">
+        <p style="font-size:14px;color:var(--t2);line-height:1.9">
+          這套探索，來自陳海倫的著作<span style="color:var(--t1);font-family:var(--serif)">《做自己》</span>——<br>
+          一本關於真實、自我與人生選擇的書。
+        </p>
+        <p style="font-size:12px;color:var(--t3);margin-top:6px;letter-spacing:.05em">
+          已有 3,000+ 讀者參與相關課程與探索
+        </p>
+      </div>
 
       <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:0">
         <button onclick="go(2)" class="btn-cta px-14 rounded-full"
@@ -284,9 +310,6 @@ input[type=text]::placeholder { color: #6e6e78; }
           開始探索
         </button>
         <p style="font-size:12px;color:var(--t3);letter-spacing:.08em">約需 4 分鐘 · 完全匿名</p>
-        <p style="font-size:12px;color:var(--t3);letter-spacing:.05em;margin-top:4px">
-          框架來自《做自己》陳海倫 · 逾 3,000 人完成
-        </p>
       </div>
     </div>
 
@@ -455,7 +478,10 @@ input[type=text]::placeholder { color: #6e6e78; }
       <!-- ── Email 收集（在情緒最高點，報告剛讀完）── -->
       <div class="lead-zone" style="margin-bottom:12px">
         <p style="font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:12px">
-          把這份鏡像報告寄到你的信箱，<br>同時收到一份延伸閱讀資料。
+          留下 Email，我們會寄給你：<br>
+          <span style="color:var(--t1)">✓ 完整鏡像報告 PDF</span><br>
+          <span style="color:var(--t1)">✓ 《做自己》試閱章節</span><br>
+          <span style="color:var(--t1)">✓ 自我探索工作表</span>
         </p>
         <div style="display:flex;gap:8px">
           <div class="vwrap" style="flex:1"><input type="text" id="em" placeholder="你的 Email" class="rounded-lg flex-1"
@@ -549,6 +575,46 @@ input[type=text]::placeholder { color: #6e6e78; }
           讀者說：「不是這本書改變了我，<br>是它讓我第一次看清楚了自己。」</span>
         </p>
 
+        <!-- 試閱：讓讀者親眼看到內容值不值得 -->
+        <div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)">
+          <p style="font-size:12px;color:var(--t3);letter-spacing:.1em;
+                    text-transform:uppercase;margin-bottom:12px">翻開第一頁</p>
+          <div class="book-line">
+            <p style="font-size:14px;color:var(--t2);line-height:2.1;font-family:var(--serif)">
+              「做自己，是不受壓抑、以本性在生活，<br>真正地擁有自己的人生。<br><br>
+              全世界不會有完全一樣的兩個人。<br>
+              你獨一無二的地方，<br>
+              就是你最美麗、最偉大的地方。」
+            </p>
+          </div>
+
+          <div id="excerpt-more" style="display:none;margin-top:16px">
+            <p style="font-size:12px;color:var(--t3);letter-spacing:.08em;margin-bottom:8px">試讀 · 擁抱獨一無二的靈魂</p>
+            <p style="font-size:13px;color:var(--t2);line-height:2.05;margin-bottom:16px">
+              你就是你自己，所以沒有必要去模仿別人，你永遠都無法模仿到百分之百，也沒有辦法真正成為另一個人。
+              如果能夠做自己，你就是獨一無二、天下無雙的。
+              你一定跟別人不一樣，就像世界上不會有完全一樣的地點，不會有一樣的兩棵樹，也不會有完全一樣的兩朵花。
+              這種獨特性，就是「自己」存在的價值。
+            </p>
+            <p style="font-size:12px;color:var(--t3);letter-spacing:.08em;margin-bottom:8px">試讀 · 成為自己靈魂的知己</p>
+            <p style="font-size:13px;color:var(--t2);line-height:2.05;margin-bottom:16px">
+              在這個世界上，你能想到的所有夢想、最棒的補償，都只有自己可以給自己。
+              當你決心要去補、去付出，做到自己夢寐以求的事情，你就是自己最棒的朋友。
+              不管千山萬水都陪「他」到底，不管有什麼苦頭都幫他吃，給他鼓勵、給他照顧、給他支持，陪著他達到目標為止。<br><br>
+              你應該要做自己的貴人，不要想著哪天能夠出現一個知己，<span style="color:var(--t1)">應該學會做自己的知己。</span>
+            </p>
+            <p style="font-size:13px;color:var(--amber-mid);font-family:var(--serif);font-style:italic;line-height:1.9">
+              「找到最珍愛、最喜歡、最感動的自己之後，<br>這一生就沒有白活。」
+            </p>
+          </div>
+
+          <button type="button" id="excerpt-btn" onclick="event.stopPropagation();toggleExcerpt()"
+                  class="btn-sec rounded-full"
+                  style="margin-top:14px;padding:9px 24px;font-size:13px;letter-spacing:.08em">
+            閱讀更多試閱 ↓
+          </button>
+        </div>
+
         <!-- 適合誰 -->
         <div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)">
           <p style="font-size:12px;color:var(--t3);letter-spacing:.1em;
@@ -603,27 +669,34 @@ input[type=text]::placeholder { color: #6e6e78; }
             <div>
               <p style="font-size:15px;color:var(--t1);font-weight:500;margin-bottom:2px;
                         font-family:var(--serif)">陳海倫</p>
-              <p style="font-size:12px;color:var(--t3);letter-spacing:.04em">心橋顧問公司總裁</p>
+              <p style="font-size:12px;color:var(--t3);letter-spacing:.04em">心橋創辦人</p>
             </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:4px">
-            <p style="font-size:13px;color:var(--t2);line-height:1.7">
-              ✦ 旅美創業 35 年　✦ 心橋公司總裁 24 年
-            </p>
-            <p style="font-size:13px;color:var(--t2);line-height:1.7">
-              ✦ 國際管理顧問　✦ 兩性親子教育講師
-            </p>
-            <p style="font-size:13px;color:var(--t2);line-height:1.7">
-              ✦ 輔導超過數千個家庭與個案
-            </p>
-          </div>
+          <p style="font-size:13px;color:var(--t2);line-height:2">
+            20 多年來陪伴上千個家庭與個案，<br>
+            協助人們重新認識自己，與生命的方向。<br>
+            <span style="color:var(--t1)">《做自己》是她多年實務經驗的整理與沉澱。</span>
+          </p>
         </div>
 
-        <!-- 主 CTA -->
-        <div class="btn-cta rounded-full" style="padding:15px 24px;font-size:17px;
-             letter-spacing:.1em;width:100%;cursor:pointer">
-          找到「你為什麼是今天這樣」的答案 →
-        </div>
+        <!-- 主 CTA：明確綁定跳轉，行動清楚 -->
+        <button type="button" class="btn-cta rounded-full"
+                onclick="event.stopPropagation();window.open('https://pia640210.github.io/creative-publisher/','_blank')"
+                style="padding:16px 24px;font-size:17px;letter-spacing:.1em;width:100%">
+          購買《做自己》→
+        </button>
+        <p style="font-size:12px;color:var(--t3);text-align:center;margin-top:10px;letter-spacing:.05em">
+          找到「你為什麼是今天這樣」的答案
+        </p>
+      </div>
+
+      <!-- 次層 CTA：了解更多 -->
+      <div style="text-align:center;margin-top:14px">
+        <a href="https://pia640210.github.io/creative-publisher/" target="_blank"
+           class="btn-sec rounded-full" style="padding:10px 32px;font-size:13px;
+           letter-spacing:.08em;text-decoration:none">
+          了解《做自己》這本書
+        </a>
       </div>
 
       <!-- 次 CTA：低壓力出口，接住猶豫者 -->
@@ -724,8 +797,12 @@ function go(n) {
     } else {
       document.getElementById('s'+n)?.classList.add('on');
     }
+    topScroll();
   }, delay);
 }
+
+// ── 回到頂部 ──
+function topScroll(){ window.scrollTo({top:0, behavior:'smooth'}); }
 
 // ── 啟動 ──
 function boot(){
@@ -817,6 +894,7 @@ function shatter(){
     hideMask();
     document.body.style.background=var_bg;
     renderReport();
+    topScroll();
   },1400);
 }
 const var_bg='#09090b';
@@ -870,6 +948,7 @@ function goBook(){
   document.getElementById('s6').classList.remove('on');
   document.getElementById('s7').classList.add('on');
   prog(7);
+  topScroll();
 }
 
 // ── Email ──
@@ -904,6 +983,15 @@ function particles(){
   }
 }
 
+// ── 試閱展開 ──
+function toggleExcerpt(){
+  const more = document.getElementById('excerpt-more');
+  const btn  = document.getElementById('excerpt-btn');
+  const open = more.style.display === 'none';
+  more.style.display = open ? 'block' : 'none';
+  btn.innerText = open ? '收起試閱 ↑' : '閱讀更多試閱 ↓';
+}
+
 // ── 語音輸入（Web Speech API）──
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recog = null;
@@ -926,8 +1014,14 @@ function voice(id, btn){
     input.value = base + txt;
   };
   recog.onerror = ev => {
-    if(ev.error === 'not-allowed')
-      alert('請允許麥克風權限後再試一次。');
+    btn.classList.remove('rec');
+    if(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){
+      alert('無法取得麥克風權限。\n若你正使用 LINE 或 FB 內建瀏覽器，請點右上角選單，改用 Safari / Chrome 開啟本頁後再試。');
+    } else if(ev.error === 'no-speech'){
+      // 沒收到聲音，靜默結束即可
+    } else {
+      alert('語音輸入暫時無法使用，請改用打字輸入。');
+    }
   };
   recog.onend = () => {
     btn.classList.remove('rec');
