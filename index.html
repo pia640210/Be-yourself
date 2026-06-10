@@ -4,7 +4,46 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>真實鏡像｜你現在活出的，真的是你嗎？</title>
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4">
+// ── 語音輸入（Web Speech API）──
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recog = null;
+function voice(id, btn){
+  if(!SR){
+    alert('此瀏覽器不支援語音輸入，建議改用 Chrome、Edge 或 Safari。');
+    return;
+  }
+  if(recog){ recog.stop(); return; }   // 再按一次 = 停止
+  const input = document.getElementById(id);
+  const base = input.value;
+  recog = new SR();
+  recog.lang = 'zh-TW';
+  recog.interimResults = true;
+  recog.continuous = false;
+  btn.classList.add('rec');
+  recog.onresult = e => {
+    let txt = '';
+    for(const r of e.results) txt += r[0].transcript;
+    input.value = base + txt;
+  };
+  recog.onerror = ev => {
+    if(ev.error === 'not-allowed')
+      alert('請允許麥克風權限後再試一次。');
+  };
+  recog.onend = () => {
+    btn.classList.remove('rec');
+    recog = null;
+    if(typeof calcCrack === 'function') calcCrack();  // 語音填答也觸發面具裂痕
+  };
+  recog.start();
+}
+// 不支援語音的瀏覽器：隱藏麥克風按鈕
+if(!SR){
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.mic').forEach(m => m.style.display = 'none');
+  });
+}
+</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600&family=Noto+Sans+TC:wght@300;400;500&display=swap');
 
@@ -13,9 +52,9 @@
   --surface: #0f0f11;
   --border: #1c1c20;
   --border-hi: #28282e;
-  --t1: #e4e4e7;
-  --t2: #71717a;
-  --t3: #3f3f46;
+  --t1: #f5f5f7;
+  --t2: #b0b0ba;
+  --t3: #8a8a94;
   --amber: #92400e;
   --amber-mid: #b45309;
   --amber-hi: #d97706;
@@ -47,11 +86,11 @@ body {
 /* ─── 侵入式回聲 ─── */
 .echo {
   position: fixed; font-family: var(--serif);
-  color: #3f3f46; font-size: 10px; letter-spacing: .18em; font-style: italic;
+  color: #8a8a94; font-size: 13px; letter-spacing: .18em; font-style: italic;
   pointer-events: none; z-index: 40; opacity: 0; filter: blur(3px);
   transition: opacity 1.8s ease, filter 1.8s ease;
 }
-.echo.show { opacity: .55; filter: blur(0); }
+.echo.show { opacity: .75; filter: blur(0); }
 
 /* ─── 面具 ─── */
 .mask-wrap { width: 88px; height: 116px; perspective: 1200px; }
@@ -74,7 +113,8 @@ input[type=text] {
   font-family: var(--sans); color: var(--t1);
   transition: border-color .5s ease; width: 100%;
 }
-input[type=text]:focus { outline: none; border-color: var(--border-hi); }
+input[type=text]:focus { outline: none; border-color: var(--amber-mid); }
+input[type=text]::placeholder { color: #6e6e78; }
 
 /* ─── 進度條 ─── */
 #pbar {
@@ -143,7 +183,7 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
 .badge {
   background: rgba(180,83,9,.06); border: 1px solid rgba(180,83,9,.14);
   border-radius: 999px; padding: 3px 10px;
-  font-size: 9px; color: #92400e; letter-spacing: .1em;
+  font-size: 12px; color: #e8a13c; letter-spacing: .1em;
 }
 
 /* ─── typewriter cursor ─── */
@@ -167,6 +207,29 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
 .data-row { display:flex; justify-content:space-between; align-items:baseline;
             padding: 5px 0; border-bottom: 1px solid var(--border); }
 .data-row:last-child { border-bottom: none; }
+
+
+/* ─── 語音輸入 ─── */
+.vwrap { position: relative; width: 100%; }
+.vwrap input { padding-right: 50px !important; }
+.mic {
+  position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--border-hi); background: rgba(20,20,24,.9);
+  color: var(--t2); cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .3s ease;
+}
+.mic svg { width: 17px; height: 17px; }
+.mic:hover { border-color: var(--amber-hi); color: var(--amber-hi); }
+.mic.rec {
+  background: rgba(180,83,9,.25); border-color: var(--amber-hi); color: #fbbf24;
+  animation: micpulse 1.2s infinite;
+}
+@keyframes micpulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(217,119,6,.45); }
+  50%     { box-shadow: 0 0 0 9px rgba(217,119,6,0); }
+}
 
 @media(max-width:480px){ .mask-wrap{width:72px;height:95px;} }
 @media print { body{background:#fff;color:#000;} #pbar,.echo{display:none;} }
@@ -202,26 +265,26 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
     ══════════════════════════════════════════ -->
     <div id="s1" class="sl on text-center" style="padding: 56px 0 48px">
 
-      <p class="font-mono tracking-widest uppercase" style="font-size:8px;color:var(--t3);margin-bottom:20px">
+      <p class="font-mono tracking-widest uppercase" style="font-size:11px;color:var(--t3);margin-bottom:20px">
         真實鏡像 · 自我探索系統
       </p>
 
-      <h1 style="font-family:var(--serif);font-size:22px;font-weight:300;
+      <h1 style="font-family:var(--serif);font-size:28px;font-weight:300;
           letter-spacing:.12em;line-height:1.8;color:var(--t1);margin-bottom:10px">
         你現在活出的，<br>真的是你嗎？
       </h1>
 
-      <p style="font-size:12px;color:var(--t3);letter-spacing:.05em;margin-bottom:28px">
+      <p style="font-size:15px;color:var(--t3);letter-spacing:.05em;margin-bottom:28px">
         這不是測驗。這是一面鏡子。
       </p>
 
       <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:0">
         <button onclick="go(2)" class="btn-cta px-14 rounded-full"
-                style="padding-top:14px;padding-bottom:14px;font-size:13px;letter-spacing:.14em">
+                style="padding-top:14px;padding-bottom:14px;font-size:16px;letter-spacing:.14em">
           開始探索
         </button>
-        <p style="font-size:9px;color:var(--t3);letter-spacing:.08em">約需 4 分鐘 · 完全匿名</p>
-        <p style="font-size:9px;color:var(--t3);letter-spacing:.05em;margin-top:4px">
+        <p style="font-size:12px;color:var(--t3);letter-spacing:.08em">約需 4 分鐘 · 完全匿名</p>
+        <p style="font-size:12px;color:var(--t3);letter-spacing:.05em;margin-top:4px">
           框架來自《做自己》陳海倫 · 逾 3,000 人完成
         </p>
       </div>
@@ -235,24 +298,24 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
 
       <div style="display:flex;flex-direction:column;gap:14px;max-width:360px;margin:0 auto">
         <div id="wd" style="display:flex;flex-direction:column;gap:7px">
-          <label style="font-size:11px;color:var(--t2);line-height:1.8;letter-spacing:.03em">
+          <label style="font-size:14px;color:var(--t2);line-height:1.8;letter-spacing:.03em">
             如果不用考慮任何人的感受，你最想追求、最想做的是什麼？
           </label>
-          <input type="text" id="desire" placeholder="誠實地寫下來..." class="rounded-xl"
-                 style="padding:13px 14px;font-size:12px">
+          <div class="vwrap"><input type="text" id="desire" placeholder="誠實地寫下來..." class="rounded-xl"
+                 style="padding:13px 14px;font-size:15px"><button type="button" class="mic" onclick="voice('desire',this)" title="語音輸入" aria-label="語音輸入"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
         </div>
         <div id="wf" style="display:flex;flex-direction:column;gap:7px">
-          <label style="font-size:11px;color:var(--t2);line-height:1.8;letter-spacing:.03em">
+          <label style="font-size:14px;color:var(--t2);line-height:1.8;letter-spacing:.03em">
             你內心最害怕失去的是什麼？
           </label>
-          <input type="text" id="fear" placeholder="..." class="rounded-xl"
-                 style="padding:13px 14px;font-size:12px">
+          <div class="vwrap"><input type="text" id="fear" placeholder="..." class="rounded-xl"
+                 style="padding:13px 14px;font-size:15px"><button type="button" class="mic" onclick="voice('fear',this)" title="語音輸入" aria-label="語音輸入"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
         </div>
       </div>
 
       <div class="text-center" style="margin-top:18px">
         <button id="b2" onclick="go(3)" class="btn-sec rounded-full"
-                style="padding:9px 36px;font-size:11px;letter-spacing:.1em">
+                style="padding:9px 36px;font-size:14px;letter-spacing:.1em">
           繼續 →
         </button>
       </div>
@@ -267,30 +330,30 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
 
       <div style="display:flex;flex-direction:column;gap:12px;max-width:360px;margin:0 auto">
         <div id="wp" style="display:flex;flex-direction:column;gap:7px">
-          <label style="font-size:11px;color:var(--t2);line-height:1.8">和【父母】相處時，你最常隱藏的是什麼？</label>
-          <input type="text" id="parents" placeholder="..." class="rounded-xl" style="padding:13px 14px;font-size:12px">
+          <label style="font-size:14px;color:var(--t2);line-height:1.8">和【父母】相處時，你最常隱藏的是什麼？</label>
+          <div class="vwrap"><input type="text" id="parents" placeholder="..." class="rounded-xl" style="padding:13px 14px;font-size:15px"><button type="button" class="mic" onclick="voice('parents',this)" title="語音輸入" aria-label="語音輸入"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
         </div>
         <div id="wb" style="display:flex;flex-direction:column;gap:7px">
-          <label style="font-size:11px;color:var(--t2);line-height:1.8">和【主管】相處時，你最不敢說出口的是什麼？</label>
-          <input type="text" id="boss" placeholder="..." class="rounded-xl" style="padding:13px 14px;font-size:12px">
+          <label style="font-size:14px;color:var(--t2);line-height:1.8">和【主管】相處時，你最不敢說出口的是什麼？</label>
+          <div class="vwrap"><input type="text" id="boss" placeholder="..." class="rounded-xl" style="padding:13px 14px;font-size:15px"><button type="button" class="mic" onclick="voice('boss',this)" title="語音輸入" aria-label="語音輸入"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
         </div>
         <div id="wpr" style="display:flex;flex-direction:column;gap:7px">
-          <label style="font-size:11px;color:var(--t2);line-height:1.8">和【最親近的人】相處時，你最害怕被看見的是什麼？</label>
-          <input type="text" id="partner" placeholder="..." class="rounded-xl" style="padding:13px 14px;font-size:12px">
+          <label style="font-size:14px;color:var(--t2);line-height:1.8">和【最親近的人】相處時，你最害怕被看見的是什麼？</label>
+          <div class="vwrap"><input type="text" id="partner" placeholder="..." class="rounded-xl" style="padding:13px 14px;font-size:15px"><button type="button" class="mic" onclick="voice('partner',this)" title="語音輸入" aria-label="語音輸入"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
         </div>
 
         <!-- 書籍引言植入：像是系統的一部分，不是廣告 -->
         <div class="book-line" style="margin-top:4px">
-          <p style="font-size:10px;color:var(--t3);line-height:1.9;font-style:italic;font-family:var(--serif)">
+          <p style="font-size:13px;color:var(--t3);line-height:1.9;font-style:italic;font-family:var(--serif)">
             「我們戴著面具，不是因為虛偽，而是因為某一年，我們學到了這樣做才安全。」
           </p>
-          <p style="font-size:9px;color:var(--t3);margin-top:4px;letter-spacing:.05em">— 陳海倫《做自己》</p>
+          <p style="font-size:12px;color:var(--t3);margin-top:4px;letter-spacing:.05em">— 陳海倫《做自己》</p>
         </div>
       </div>
 
       <div class="text-center" style="margin-top:16px">
         <button id="b3" onclick="go(4)" class="btn-sec rounded-full"
-                style="padding:9px 36px;font-size:11px;letter-spacing:.1em">
+                style="padding:9px 36px;font-size:14px;letter-spacing:.1em">
           繼續 →
         </button>
       </div>
@@ -301,35 +364,35 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
     ══════════════════════════════════════════ -->
     <div id="s4" class="sl" style="padding:8px 0 4px">
       <div class="text-center mb-4"><span class="badge">第三層 · 面具起源</span></div>
-      <p style="font-size:11px;color:var(--t2);text-align:center;letter-spacing:.05em;
+      <p style="font-size:14px;color:var(--t2);text-align:center;letter-spacing:.05em;
                 line-height:1.8;margin-bottom:14px">
         哪一個人生階段，你開始學會把真實的自己藏起來？
       </p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:340px;margin:0 auto">
         <label class="rcard" style="display:flex;align-items:center;gap:10px;padding:13px;
                background:rgba(15,15,17,.6);border:1px solid var(--border);border-radius:14px;
-               cursor:pointer;font-size:11px;color:var(--t2)">
+               cursor:pointer;font-size:14px;color:var(--t2)">
           <input type="radio" name="era" value="0–12 歲的童年" checked class="accent-amber-800"> 👦 0–12 歲
         </label>
         <label class="rcard" style="display:flex;align-items:center;gap:10px;padding:13px;
                background:rgba(15,15,17,.6);border:1px solid var(--border);border-radius:14px;
-               cursor:pointer;font-size:11px;color:var(--t2)">
+               cursor:pointer;font-size:14px;color:var(--t2)">
           <input type="radio" name="era" value="13–18 歲的青春期" class="accent-amber-800"> 🎒 13–18 歲
         </label>
         <label class="rcard" style="display:flex;align-items:center;gap:10px;padding:13px;
                background:rgba(15,15,17,.6);border:1px solid var(--border);border-radius:14px;
-               cursor:pointer;font-size:11px;color:var(--t2)">
+               cursor:pointer;font-size:14px;color:var(--t2)">
           <input type="radio" name="era" value="19–30 歲的探索期" class="accent-amber-800"> 💼 19–30 歲
         </label>
         <label class="rcard" style="display:flex;align-items:center;gap:10px;padding:13px;
                background:rgba(15,15,17,.6);border:1px solid var(--border);border-radius:14px;
-               cursor:pointer;font-size:11px;color:var(--t2)">
+               cursor:pointer;font-size:14px;color:var(--t2)">
           <input type="radio" name="era" value="31 歲後的成熟期" class="accent-amber-800"> ⏳ 31 歲後
         </label>
       </div>
       <div class="text-center" style="margin-top:18px">
         <button id="b4" onclick="go(5)" class="btn-cta rounded-full"
-                style="padding:11px 36px;font-size:12px;letter-spacing:.12em">
+                style="padding:11px 36px;font-size:15px;letter-spacing:.12em">
           解鎖鏡像
         </button>
       </div>
@@ -339,12 +402,12 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
          S5  靜默儀式
     ══════════════════════════════════════════ -->
     <div id="s5" class="sl text-center" style="padding:52px 0 48px">
-      <div id="tw" class="tw-cur" style="font-family:var(--serif);font-size:15px;color:var(--t2);
-           letter-spacing:.1em;line-height:2.2;min-height:66px;max-width:280px;margin:0 auto"></div>
+      <div id="tw" class="tw-cur" style="font-family:var(--serif);font-size:18px;color:var(--t2);
+           letter-spacing:.1em;line-height:2.2;min-height:88px;max-width:280px;margin:0 auto"></div>
       <div id="s5btn" style="margin-top:28px;opacity:0;transition:opacity 1.6s ease">
-        <button onclick="shatter()" style="font-size:10px;color:var(--t3);letter-spacing:.14em;
+        <button onclick="shatter()" style="font-size:13px;color:var(--t3);letter-spacing:.14em;
                 text-decoration:underline;background:none;border:none;cursor:pointer;
-                transition:color .3s" onmouseover="this.style.color='#71717a'"
+                transition:color .3s" onmouseover="this.style.color='#d4d4dc'"
                 onmouseout="this.style.color='var(--t3)'">
           （直面內心後，點擊解鎖鏡像）
         </button>
@@ -360,67 +423,67 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
 
         <!-- 報告標頭 -->
         <div style="text-align:center;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:16px">
-          <p style="font-size:8px;font-family:monospace;color:var(--t3);letter-spacing:.18em;
+          <p style="font-size:11px;font-family:monospace;color:var(--t3);letter-spacing:.18em;
                     text-transform:uppercase;margin-bottom:6px">TRUE MIRROR REPORT</p>
-          <h2 style="font-family:var(--serif);font-size:15px;font-weight:300;
+          <h2 style="font-family:var(--serif);font-size:18px;font-weight:300;
                      letter-spacing:.1em;color:var(--t1)">《真實鏡像》</h2>
         </div>
 
         <!-- 核心張力 -->
         <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
-          <p style="font-size:11px;color:var(--t2);margin-bottom:8px">你害怕失去：</p>
-          <p style="font-family:var(--serif);font-size:15px;color:#b45309;font-weight:400;
+          <p style="font-size:14px;color:var(--t2);margin-bottom:8px">你害怕失去：</p>
+          <p style="font-family:var(--serif);font-size:18px;color:#e8941f;font-weight:400;
                     margin-bottom:14px;line-height:1.6">「<span id="r-fear"></span>」</p>
-          <p style="font-size:11px;color:var(--t2);margin-bottom:8px">你渴望的是：</p>
-          <p style="font-family:var(--serif);font-size:15px;color:var(--t1);font-weight:300;
+          <p style="font-size:14px;color:var(--t2);margin-bottom:8px">你渴望的是：</p>
+          <p style="font-family:var(--serif);font-size:18px;color:var(--t1);font-weight:300;
                     line-height:1.6">「<span id="r-desire"></span>」</p>
         </div>
 
         <!-- 鏡像觀察 [V5 核心改版：不診斷，只問問題，讓讀者覺得「這本書能幫我找到答案」] -->
-        <div id="r-insight" style="font-size:11px;line-height:1.95;color:var(--t2);
+        <div id="r-insight" style="font-size:14px;line-height:1.95;color:var(--t2);
              background:rgba(0,0,0,.3);border:1px solid var(--border);
              border-radius:14px;padding:16px;margin-bottom:14px"></div>
 
         <!-- 人際紀錄 -->
-        <div id="r-data" style="font-size:10px;line-height:1.6;color:var(--t3);
+        <div id="r-data" style="font-size:13px;line-height:1.6;color:var(--t3);
              margin-bottom:12px"></div>
 
         <!-- 時間戳 -->
-        <p id="r-ts" style="font-size:8px;font-family:monospace;color:var(--t3);letter-spacing:.08em"></p>
+        <p id="r-ts" style="font-size:11px;font-family:monospace;color:var(--t3);letter-spacing:.08em"></p>
       </div>
 
       <!-- ── Email 收集（在情緒最高點，報告剛讀完）── -->
       <div class="lead-zone" style="margin-bottom:12px">
-        <p style="font-size:11px;color:var(--t2);line-height:1.8;margin-bottom:12px">
+        <p style="font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:12px">
           把這份鏡像報告寄到你的信箱，<br>同時收到一份延伸閱讀資料。
         </p>
         <div style="display:flex;gap:8px">
-          <input type="text" id="em" placeholder="你的 Email" class="rounded-lg flex-1"
-                 style="padding:10px 12px;font-size:11px">
+          <div class="vwrap" style="flex:1"><input type="text" id="em" placeholder="你的 Email" class="rounded-lg flex-1"
+                 style="padding:10px 12px;font-size:14px"><button type="button" class="mic" onclick="voice('em',this)" title="語音輸入" aria-label="語音輸入"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
           <button onclick="sendEmail()" class="btn-sec rounded-lg"
-                  style="padding:10px 14px;font-size:11px;white-space:nowrap">送出</button>
+                  style="padding:10px 14px;font-size:14px;white-space:nowrap">送出</button>
         </div>
-        <p id="em-ok" style="font-size:9px;color:var(--t3);margin-top:8px;display:none">✓ 已記錄，謝謝。</p>
-        <p style="font-size:9px;color:var(--t3);margin-top:6px">不會發送廣告。隨時可退訂。</p>
+        <p id="em-ok" style="font-size:12px;color:var(--t3);margin-top:8px;display:none">✓ 已記錄，謝謝。</p>
+        <p style="font-size:12px;color:var(--t3);margin-top:6px">不會發送廣告。隨時可退訂。</p>
       </div>
 
       <!-- 未來承諾 -->
       <div style="background:rgba(0,0,0,.35);border:1px solid var(--border);
            border-radius:16px;padding:16px;margin-bottom:14px">
-        <label style="display:block;font-size:11px;color:var(--t2);line-height:1.8;margin-bottom:10px">
+        <label style="display:block;font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:10px">
           如果一年後，你活得更像自己——<br>那時的你，想對今天的自己說什麼？
         </label>
-        <input type="text" id="future" placeholder="留一句話給一年後的自己..."
-               class="rounded-xl" style="padding:12px 14px;font-size:11px">
+        <div class="vwrap"><input type="text" id="future" placeholder="留一句話給一年後的自己..."
+               class="rounded-xl" style="padding:12px 14px;font-size:14px"><button type="button" class="mic" onclick="voice('future',this)" title="語音輸入" aria-label="語音輸入"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
         <button onclick="goBook()" class="btn-cta rounded-full"
-                style="padding:14px 36px;font-size:13px;width:100%;max-width:280px">
+                style="padding:14px 36px;font-size:16px;width:100%;max-width:280px">
           我想繼續探索 →
         </button>
         <button onclick="window.print()" class="btn-sec rounded-full"
-                style="padding:10px 24px;font-size:11px">輸出 PDF 鏡像</button>
+                style="padding:10px 24px;font-size:14px">輸出 PDF 鏡像</button>
       </div>
     </div>
 
@@ -432,19 +495,19 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
 
       <!-- 情感過渡：讓讀者覺得有未完成的事 -->
       <div style="text-align:center;margin-bottom:24px">
-        <p style="font-size:8px;font-family:monospace;color:var(--t3);
+        <p style="font-size:11px;font-family:monospace;color:var(--t3);
                   letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px">AFTERSHOCK // 餘波</p>
-        <p style="font-family:var(--serif);font-size:16px;font-weight:300;
+        <p style="font-family:var(--serif);font-size:20px;font-weight:300;
                   color:var(--t1);line-height:1.8;margin-bottom:12px">
           你剛剛看見了一些東西。
         </p>
-        <p style="font-size:12px;color:var(--t2);line-height:2;max-width:300px;margin:0 auto 20px">
+        <p style="font-size:15px;color:var(--t2);line-height:2;max-width:300px;margin:0 auto 20px">
           那個藏在面具後面的自己，<br>
           你已經多久沒有認真看過他了？
         </p>
 
         <!-- 【轉換關鍵文案】製造懸念，書是答案，不是廣告 -->
-        <p style="font-size:11px;color:var(--t3);line-height:1.9;max-width:280px;margin:0 auto">
+        <p style="font-size:14px;color:var(--t3);line-height:1.9;max-width:280px;margin:0 auto">
           你剛才看見了恐懼，也看見了渴望。<br>
           但你有沒有注意到——<br>
           <span style="color:var(--t2)">你其實還沒看到：<br>
@@ -464,13 +527,13 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
                       box-shadow:0 8px 24px rgba(0,0,0,.6);
                       border:1px solid rgba(255,255,255,.04)">
           <div style="flex:1;padding-top:4px">
-            <p style="font-size:8px;letter-spacing:.18em;text-transform:uppercase;
+            <p style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;
                       color:var(--t3);margin-bottom:8px">繼續這場探索</p>
-            <h3 style="font-family:var(--serif);font-size:20px;font-weight:400;
+            <h3 style="font-family:var(--serif);font-size:24px;font-weight:400;
                        color:var(--t1);letter-spacing:.08em;margin-bottom:4px;
                        line-height:1.4">《做自己》</h3>
-            <p style="font-size:9px;color:var(--t3);margin-bottom:6px">陳海倫 著 · 創意出版社</p>
-            <p style="font-size:10px;color:var(--amber-mid);font-family:var(--serif);
+            <p style="font-size:12px;color:var(--t3);margin-bottom:6px">陳海倫 著 · 創意出版社</p>
+            <p style="font-size:13px;color:var(--amber-mid);font-family:var(--serif);
                       font-style:italic;line-height:1.6">
               唯有做自己，<br>生命才會有色彩。
             </p>
@@ -478,29 +541,29 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
         </div>
 
         <!-- 書的定位文案：不是勵志書，是「說出你早知道的事」的書 -->
-        <p style="font-size:12px;color:var(--t2);line-height:1.95;
+        <p style="font-size:15px;color:var(--t2);line-height:1.95;
                   margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:18px">
           這本書不會告訴你要怎麼做。<br>
           它只是說出了你早就知道、<br>但一直沒有勇氣承認的那些事。<br><br>
-          <span style="color:var(--t2);font-style:italic;font-family:var(--serif);font-size:11px">
+          <span style="color:var(--t2);font-style:italic;font-family:var(--serif);font-size:14px">
           讀者說：「不是這本書改變了我，<br>是它讓我第一次看清楚了自己。」</span>
         </p>
 
         <!-- 適合誰 -->
         <div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)">
-          <p style="font-size:9px;color:var(--t3);letter-spacing:.1em;
+          <p style="font-size:12px;color:var(--t3);letter-spacing:.1em;
                     text-transform:uppercase;margin-bottom:10px">這本書適合你，如果</p>
           <div style="display:flex;flex-direction:column;gap:7px">
-            <p style="font-size:11px;color:var(--t2);line-height:1.7">
+            <p style="font-size:14px;color:var(--t2);line-height:1.7">
               ✦ 你覺得自己活得很努力，卻不確定在為誰而活
             </p>
-            <p style="font-size:11px;color:var(--t2);line-height:1.7">
+            <p style="font-size:14px;color:var(--t2);line-height:1.7">
               ✦ 你在某些關係裡總是先顧別人、最後才顧自己
             </p>
-            <p style="font-size:11px;color:var(--t2);line-height:1.7">
+            <p style="font-size:14px;color:var(--t2);line-height:1.7">
               ✦ 你想改變，但不知道從哪裡開始
             </p>
-            <p style="font-size:11px;color:var(--t2);line-height:1.7">
+            <p style="font-size:14px;color:var(--t2);line-height:1.7">
               ✦ 你已經厭倦了扮演那個「應該有的樣子」
             </p>
           </div>
@@ -509,24 +572,24 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
         <!-- 讀者推薦：3 則，要有溫度，不要像業配 -->
         <div style="display:flex;flex-direction:column;gap:9px;
                     margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)">
-          <p style="font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">讀者說</p>
+          <p style="font-size:12px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">讀者說</p>
           <div class="tcard">
-            <p style="font-size:10px;color:var(--t2);line-height:1.9">
+            <p style="font-size:13px;color:var(--t2);line-height:1.9">
               「看了三分之一就放下來兩天。有些地方讓我很不舒服。後來再拿起來，才發現作者講的其實就是我自己。」
             </p>
-            <p style="font-size:9px;color:var(--t3);margin-top:8px">— 台北，42 歲，企業主管</p>
+            <p style="font-size:12px;color:var(--t3);margin-top:8px">— 台北，42 歲，企業主管</p>
           </div>
           <div class="tcard">
-            <p style="font-size:10px;color:var(--t2);line-height:1.9">
+            <p style="font-size:13px;color:var(--t2);line-height:1.9">
               「我一直以為我已經很了解自己了。這本書讓我意識到，我所認識的那個自己，不過是我一直在扮演的角色。」
             </p>
-            <p style="font-size:9px;color:var(--t3);margin-top:8px">— 新竹，29 歲，設計師</p>
+            <p style="font-size:12px;color:var(--t3);margin-top:8px">— 新竹，29 歲，設計師</p>
           </div>
           <div class="tcard">
-            <p style="font-size:10px;color:var(--t2);line-height:1.9">
+            <p style="font-size:13px;color:var(--t2);line-height:1.9">
               「它沒有叫我做什麼。只是在某一頁，我突然就哭了。說不上來為什麼。」
             </p>
-            <p style="font-size:9px;color:var(--t3);margin-top:8px">— 高雄，36 歲，護理師</p>
+            <p style="font-size:12px;color:var(--t3);margin-top:8px">— 高雄，36 歲，護理師</p>
           </div>
         </div>
 
@@ -538,26 +601,26 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
                         object-position:center top;flex-shrink:0;
                         border:1px solid var(--border-hi);filter:brightness(.92)">
             <div>
-              <p style="font-size:12px;color:var(--t1);font-weight:500;margin-bottom:2px;
+              <p style="font-size:15px;color:var(--t1);font-weight:500;margin-bottom:2px;
                         font-family:var(--serif)">陳海倫</p>
-              <p style="font-size:9px;color:var(--t3);letter-spacing:.04em">心橋顧問公司總裁</p>
+              <p style="font-size:12px;color:var(--t3);letter-spacing:.04em">心橋顧問公司總裁</p>
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px">
-            <p style="font-size:10px;color:var(--t2);line-height:1.7">
+            <p style="font-size:13px;color:var(--t2);line-height:1.7">
               ✦ 旅美創業 35 年　✦ 心橋公司總裁 24 年
             </p>
-            <p style="font-size:10px;color:var(--t2);line-height:1.7">
+            <p style="font-size:13px;color:var(--t2);line-height:1.7">
               ✦ 國際管理顧問　✦ 兩性親子教育講師
             </p>
-            <p style="font-size:10px;color:var(--t2);line-height:1.7">
+            <p style="font-size:13px;color:var(--t2);line-height:1.7">
               ✦ 輔導超過數千個家庭與個案
             </p>
           </div>
         </div>
 
         <!-- 主 CTA -->
-        <div class="btn-cta rounded-full" style="padding:15px 24px;font-size:14px;
+        <div class="btn-cta rounded-full" style="padding:15px 24px;font-size:17px;
              letter-spacing:.1em;width:100%;cursor:pointer">
           找到「你為什麼是今天這樣」的答案 →
         </div>
@@ -565,9 +628,9 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
 
       <!-- 次 CTA：低壓力出口，接住猶豫者 -->
       <div style="text-align:center;margin-top:16px">
-        <button onclick="go(8)" style="font-size:10px;color:var(--t3);letter-spacing:.1em;
+        <button onclick="go(8)" style="font-size:13px;color:var(--t3);letter-spacing:.1em;
                 text-decoration:underline;background:none;border:none;cursor:pointer;
-                transition:color .3s" onmouseover="this.style.color='#71717a'"
+                transition:color .3s" onmouseover="this.style.color='#d4d4dc'"
                 onmouseout="this.style.color='var(--t3)'">
           我還沒準備好，先想想
         </button>
@@ -579,11 +642,11 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
          【不放棄這批人，收 LINE，留住再行銷機會】
     ══════════════════════════════════════════ -->
     <div id="s8" class="sl text-center" style="padding:40px 0 32px;max-width:300px;margin:0 auto">
-      <p style="font-family:var(--serif);font-size:16px;font-weight:300;
+      <p style="font-family:var(--serif);font-size:20px;font-weight:300;
                 color:var(--t1);line-height:1.8;margin-bottom:16px">
         這樣也很好。
       </p>
-      <p style="font-size:12px;color:var(--t2);line-height:2;margin-bottom:28px">
+      <p style="font-size:15px;color:var(--t2);line-height:2;margin-bottom:28px">
         你剛才寫下的那些東西，<br>
         不會消失。<br>
         它們會繼續在某個地方等你。
@@ -591,21 +654,21 @@ input[type=text]:focus { outline: none; border-color: var(--border-hi); }
 
       <!-- LINE 收集 -->
       <div class="lead-zone" style="text-align:left;margin-bottom:20px">
-        <p style="font-size:11px;color:var(--t2);line-height:1.8;margin-bottom:12px">
+        <p style="font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:12px">
           如果之後想繼續——<br>留下你的 LINE，我們會在對的時候輕輕找你。
         </p>
         <div style="display:flex;gap:8px">
-          <input type="text" id="li" placeholder="LINE ID 或 @帳號"
-                 class="rounded-lg flex-1" style="padding:10px 12px;font-size:11px">
+          <div class="vwrap" style="flex:1"><input type="text" id="li" placeholder="LINE ID 或 @帳號"
+                 class="rounded-lg flex-1" style="padding:10px 12px;font-size:14px"><button type="button" class="mic" onclick="voice('li',this)" title="語音輸入" aria-label="語音輸入"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
           <button onclick="sendLine()" class="btn-sec rounded-lg"
-                  style="padding:10px 14px;font-size:11px;white-space:nowrap">送出</button>
+                  style="padding:10px 14px;font-size:14px;white-space:nowrap">送出</button>
         </div>
-        <p id="li-ok" style="font-size:9px;color:var(--t3);margin-top:8px;display:none">✓ 已收到。</p>
+        <p id="li-ok" style="font-size:12px;color:var(--t3);margin-top:8px;display:none">✓ 已收到。</p>
       </div>
 
       <a href="https://pia640210.github.io/creative-publisher/" target="_blank"
-         style="font-size:10px;color:var(--t3);letter-spacing:.1em;text-decoration:underline;
-                transition:color .3s" onmouseover="this.style.color='#71717a'"
+         style="font-size:13px;color:var(--t3);letter-spacing:.1em;text-decoration:underline;
+                transition:color .3s" onmouseover="this.style.color='#d4d4dc'"
          onmouseout="this.style.color='var(--t3)'">
         或者，現在就去看看這本書
       </a>
@@ -839,6 +902,45 @@ function particles(){
     p.style.animationDelay=(Math.random()*6)+'s';
     document.body.appendChild(p);
   }
+}
+
+// ── 語音輸入（Web Speech API）──
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recog = null;
+function voice(id, btn){
+  if(!SR){
+    alert('此瀏覽器不支援語音輸入，建議改用 Chrome、Edge 或 Safari。');
+    return;
+  }
+  if(recog){ recog.stop(); return; }   // 再按一次 = 停止
+  const input = document.getElementById(id);
+  const base = input.value;
+  recog = new SR();
+  recog.lang = 'zh-TW';
+  recog.interimResults = true;
+  recog.continuous = false;
+  btn.classList.add('rec');
+  recog.onresult = e => {
+    let txt = '';
+    for(const r of e.results) txt += r[0].transcript;
+    input.value = base + txt;
+  };
+  recog.onerror = ev => {
+    if(ev.error === 'not-allowed')
+      alert('請允許麥克風權限後再試一次。');
+  };
+  recog.onend = () => {
+    btn.classList.remove('rec');
+    recog = null;
+    if(typeof calcCrack === 'function') calcCrack();  // 語音填答也觸發面具裂痕
+  };
+  recog.start();
+}
+// 不支援語音的瀏覽器：隱藏麥克風按鈕
+if(!SR){
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.mic').forEach(m => m.style.display = 'none');
+  });
 }
 </script>
 </body>
