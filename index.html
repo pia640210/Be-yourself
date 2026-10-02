@@ -112,21 +112,6 @@ img{max-width:100%;display:block}
 .note:nth-child(3){transform:rotate(-.8deg)}
 @media(max-width:700px){.notes{grid-template-columns:1fr;gap:26px;max-width:420px;margin:0 auto}.note:nth-child(2){margin-top:0}}
 
-/* 適合誰 */
-.who{list-style:none;max-width:40em}
-.who li{padding:18px 0 18px 22px;border-top:1px solid var(--line);position:relative;font-size:15px;color:var(--soft);line-height:1.9}
-.who li:last-child{border-bottom:1px solid var(--line)}
-.who li::before{content:"";position:absolute;left:0;top:30px;width:10px;height:2px;background:var(--amber)}
-.who b{display:block;color:var(--ink);font-size:16px;font-weight:700}
-
-/* 核心提要 */
-.core{border-top:1px solid var(--line)}
-.core-row{display:grid;grid-template-columns:260px 1fr;gap:40px;padding:34px 0;border-bottom:1px solid var(--line)}
-.core-tag{font-size:13px;color:var(--amber-deep);margin-bottom:6px}
-.core-head h3{font-family:var(--serif);font-size:19px;font-weight:700;line-height:1.6}
-.core-row p{font-size:15.5px;line-height:2;color:var(--soft);max-width:34em}
-@media(max-width:700px){.core-row{grid-template-columns:1fr;gap:12px;padding:26px 0}}
-
 /* 可展開的區塊（試讀、目錄） */
 .collapsible{--fade:var(--white)}
 .section.alt .collapsible{--fade:var(--alt)}
@@ -141,8 +126,6 @@ img{max-width:100%;display:block}
 .sample-title{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1.6;margin-bottom:20px}
 .sample{--h:520px;max-width:36em}
 .sample p{font-family:var(--serif);font-size:17px;line-height:2.15;color:#2a2a2a;margin-bottom:1.1em}
-.sample-end{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--soft)}
-.sample-end a{color:var(--amber);text-decoration:underline}
 
 /* 目錄 */
 .toc{--h:560px}
@@ -156,10 +139,6 @@ img{max-width:100%;display:block}
 .toc-single{font-size:15.5px;font-weight:700;padding-bottom:22px;break-inside:avoid}
 @media(max-width:700px){.toc-cols{columns:1}.toc{--h:420px}}
 
-/* 編輯推薦 */
-.recs{display:flex;flex-direction:column;gap:12px;max-width:40em}
-.rec{font-size:15px;color:var(--soft);line-height:1.95;background:#FFFBF2;border-left:3px solid #EF9F27;border-radius:0 8px 8px 0;padding:14px 18px}
-
 /* 關於作者 */
 .author{display:grid;grid-template-columns:150px 1fr;gap:36px;align-items:start}
 .avatar{width:150px;height:150px;border-radius:50%;object-fit:cover;border:3px solid var(--amber-wash)}
@@ -169,25 +148,36 @@ img{max-width:100%;display:block}
 .facts{list-style:none;display:flex;gap:34px;flex-wrap:wrap;margin:20px 0}
 .facts li{font-size:13px;color:var(--mute);line-height:1.5}
 .facts b{display:block;font-family:var(--serif);font-size:24px;color:var(--ink);font-weight:700;line-height:1.2}
-.author .extra{font-size:14px;color:#777;margin-top:4px}
-.author .personal{margin-top:12px}
+.author-more{margin-top:4px;font-size:14px}
+.author-more a{color:var(--amber);text-decoration:underline;text-underline-offset:3px}
+.sec-title + .author{margin-top:30px}
 @media(max-width:700px){.author{grid-template-columns:1fr;gap:20px}.avatar{width:104px;height:104px}}
+
+/* 簡介裡的「五件事」 */
+.five-label{font-size:13px;font-weight:700;color:var(--amber-deep);margin:34px 0 8px}
+.five{list-style:none;max-width:36em}
+.five li{padding:10px 0 10px 22px;border-top:1px solid var(--line);position:relative;font-size:15.5px;color:var(--ink)}
+.five li:last-child{border-bottom:1px solid var(--line)}
+.five li::before{content:"";position:absolute;left:0;top:1.35em;width:10px;height:2px;background:var(--amber)}
+
+/* 行動呼籲 */
+.btn-lg{font-size:16px;padding:15px 32px;border-radius:10px}
+.cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;margin-top:34px;font-size:15px;color:var(--soft)}
+.nav-links a.nav-cta{background:var(--amber);color:var(--amber-wash);padding:6px 18px;border-radius:8px}
+.nav-links a.nav-cta:hover{background:#9a6010;color:var(--amber-wash)}
+@media(max-width:760px){.nav-links a.nav-cta{background:none;color:var(--amber);padding:12px 2px;font-weight:700}}
 
 /* 購書 */
 .buy{max-width:40em}
-.price{font-family:var(--serif);font-size:30px;font-weight:700;margin-bottom:4px}
+.price{font-family:var(--serif);font-size:30px;font-weight:700;margin-bottom:16px}
 .price small{font-family:var(--sans);font-size:13px;font-weight:400;color:var(--mute);margin-left:8px}
-.buy-links{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 16px}
-.buy-link{font-size:14px;padding:10px 20px;border-radius:8px;border:1px solid #ddd;background:var(--white);transition:border-color .2s,color .2s}
-.buy-link:hover{border-color:var(--amber);color:var(--amber)}
-.buy-link.primary{background:var(--amber);color:var(--amber-wash);border-color:var(--amber)}
-.buy-link.primary:hover{background:#9a6010;color:var(--amber-wash)}
-.buy-note{font-size:13px;color:#993C1D;margin-bottom:6px}
-.buy-note.mute{color:#aaa}
-.bundle{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#FFFBF2;border:1px solid #EF9F27;border-radius:10px;padding:12px 16px;margin-top:26px;font-size:13px;color:#633806;line-height:1.7}
+.order-line{font-size:14px;color:var(--soft);margin-top:18px;line-height:1.9}
+.order-line a,.other-shops a{color:var(--amber);text-decoration:underline;text-underline-offset:3px}
+.order-line a{margin-left:10px}
+.bundle{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#FFFBF2;border:1px solid #EF9F27;border-radius:10px;padding:14px 18px;margin-top:26px;font-size:14px;color:#633806;line-height:1.8}
 .bundle-tag{font-size:11px;font-weight:700;color:#fff;background:var(--amber);border-radius:6px;padding:3px 10px;white-space:nowrap}
-.bundle a{color:var(--amber);text-decoration:underline}
-.share{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--soft)}
+.other-shops{font-size:13px;color:var(--mute);margin-top:26px;line-height:1.9}
+.share{margin-top:22px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--soft)}
 .share a{display:inline-block;margin-left:8px;padding:8px 16px;border-radius:8px;background:#06C755;color:#fff;font-size:13px;font-weight:500}
 .share a:hover{background:#05a948}
 
@@ -198,7 +188,9 @@ img{max-width:100%;display:block}
 .more-card:hover img{transform:translateY(-3px)}
 .more-card b{display:block;font-size:15px;line-height:1.5}
 .more-card span{display:block;font-size:12.5px;color:var(--amber-deep);line-height:1.6;margin-top:2px}
-.more-all{margin-top:28px;font-size:14px}
+.more-bundle{margin-top:36px;padding:22px 24px;background:#FFFBF2;border:1px solid #EF9F27;border-radius:12px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
+.more-bundle p{font-size:15px;color:#633806;line-height:1.8;max-width:30em}
+.more-all{margin-top:22px;font-size:14px}
 .more-all a{color:var(--amber);text-decoration:underline}
 @media(max-width:700px){.more-grid{grid-template-columns:repeat(2,1fr);gap:18px}}
 
@@ -275,7 +267,7 @@ footer p{font-size:13px;color:#aaa}
     <a href="#sample">試讀</a>
     <a href="#toc">目錄</a>
     <a href="#author">關於作者</a>
-    <a href="#buy">購書</a>
+    <a class="nav-cta" href="#buy">訂購</a>
   </div>
 </nav>
 
@@ -290,7 +282,7 @@ footer p{font-size:13px;color:#aaa}
       </h1>
       <p class="hero-sub">走過千山萬水，歷盡百轉千迴——談生命定位、破除影子複製、修煉誠實功力，做自己最棒的知己與貴人。</p>
       <div class="hero-btns">
-        <a class="btn btn-primary" href="#buy">哪裡可以買</a>
+        <a class="btn btn-primary" href="#buy">向出版社訂購　NT$380</a>
         <a class="btn btn-outline" href="#sample">先看試讀</a>
       </div>
     </div>
@@ -306,10 +298,16 @@ footer p{font-size:13px;color:#aaa}
     <div class="sec-sub">唯有做自己，生命才會有色彩。</div>
     <div class="prose">
       <p>為什麼「做自己」這麼重要？如果這件事真那麼重要，我們又該如何真正做到？</p>
-      <p>大部分的人並不了解怎樣才是真正的「做自己」，常常口是心非、迎合討好，甚至在不經意間複製了身邊親近之人的缺點與包袱，在生活的「布袋戲」中扮演著別人的影子。</p>
-      <p>本書由陳海倫顧問親撰，深刻點出：<strong>「自己」不是一個凝固不動的終點，而是一種靈魂的「生命定位」。</strong>就像計算機需要歸零、相機需要對焦、打高爾夫球需要找對重心；唯有找到真實的著力點，生命才能施力，開啟無限潛能。</p>
       <p>本書不提供空洞的勵志口號，而是提出具體的<strong>「做自己七大步驟」</strong>與<strong>「進退拿捏之術」</strong>，陪伴每一位讀者剝離內在的雜音與恐懼，誠實面對自我、突破成長的痛苦，活出獨一無二、天下無雙的尊嚴與自由。</p>
     </div>
+    <div class="five-label">書裡談的五件事</div>
+    <ul class="five">
+      <li>「自己」是一種生命定位</li>
+      <li>「我在演誰？」破除影子複製</li>
+      <li>什麼才是真正的自己？</li>
+      <li>自信是練出來的，不是自我感覺良好</li>
+      <li>進退皆在方寸之間</li>
+    </ul>
   </div>
 </section>
 
@@ -329,11 +327,8 @@ footer p{font-size:13px;color:#aaa}
     <div class="sec-sub">值得抄下來，貼在看得到的地方。</div>
     <ul class="quotes">
       <li>「全世界不會有完全一樣的兩個人。你獨一無二的地方，就是你最美麗、最偉大的地方。」</li>
-      <li>「做自己，是不受壓抑、以本性在生活，真正地擁有自己的人生。」</li>
       <li>「在這個世界上，你能想到的所有夢想、最棒的補償，都只有自己可以給自己。你應該做自己的知己！」</li>
-      <li>「誠實，是一種功力。它是需要一層次、一層次逐漸提昇的修行。」</li>
-      <li>「負面的東西都不是真的。正面的想法、在理智下做出的決定，才是真正的你。」</li>
-      <li>「進退拿捏得宜，是做自己可以表現出來的美德。」</li>
+      <li>「做自己，是不受壓抑、以本性在生活，真正地擁有自己的人生。」</li>
     </ul>
   </div>
 </section>
@@ -347,49 +342,7 @@ footer p{font-size:13px;color:#aaa}
       <figure class="note"><img src="note-2.jpg" alt="手寫便利貼留言：你願意為「做自己」給到什麼程度？能為選擇買單，愛上產生的結果，就是真實的做自己。" loading="lazy"></figure>
       <figure class="note"><img src="note-3.jpg" alt="手寫便利貼留言：我最想要推薦的一本書是做自己，這本書對我意義深遠，也是我第一本買的書，也是我最喜歡的一本書，很推薦大家來看。" loading="lazy"></figure>
     </div>
-  </div>
-</section>
-
-<section class="section" id="who">
-  <div class="wrap">
-    <h2 class="sec-title">這本書適合誰讀</h2>
-    <div class="sec-sub">如果你符合其中一項，這本書就是為你寫的。</div>
-    <ul class="who">
-      <li><b>迷惘於生命定位者</b>生活渾渾噩噩、找不到人生著力點與熱情方向。</li>
-      <li><b>習慣討好迎合他人者</b>處處委曲求全、害怕拒絕別人而失去自我。</li>
-      <li><b>受原生家庭束縛者</b>察覺自己不自覺複製了父母或長輩的焦慮與缺點。</li>
-      <li><b>人際界線模糊困擾者</b>混淆「自私」與「做自己」，在進退之間左右為難。</li>
-      <li><b>渴望真誠活出自我者</b>期盼透過誠實與進步，建立真正厚實的自信與內在平靜。</li>
-    </ul>
-  </div>
-</section>
-
-<section class="section alt" id="core">
-  <div class="wrap">
-    <h2 class="sec-title">五個核心提要</h2>
-    <div class="sec-sub">讀這本書之前，先知道它想說什麼。</div>
-    <div class="core">
-      <div class="core-row">
-        <div class="core-head"><div class="core-tag">生命對焦與歸零</div><h3>「自己」是一種生命定位</h3></div>
-        <p>就像撲克牌每一張都有專屬座標，你必須確認自己的定位。找不到自己，就像拿著一台對不到焦的相機，拍出來的景色永遠是模糊的一片。</p>
-      </div>
-      <div class="core-row">
-        <div class="core-head"><div class="core-tag">破除影子複製</div><h3>「我在演誰？」</h3></div>
-        <p>我們常在不經意間被親近之人的影子「附身」，複製了長輩的脾氣與惡習。本書教你如何大聲對腦海中的雜音說：「安靜！我說了算！」，把不屬於自己的刺一一拔除。</p>
-      </div>
-      <div class="core-row">
-        <div class="core-head"><div class="core-tag">理智下的真實</div><h3>什麼才是真正的自己？</h3></div>
-        <p>負面的狀態、氣話與情緒化的決定都不是真的你。真正的自己，是在非常理智、心平氣和下做出的最生存選擇，並隨著不斷的學習與突破而持續動態提升。</p>
-      </div>
-      <div class="core-row">
-        <div class="core-head"><div class="core-tag">誠實與自信</div><h3>自信是練出來的，不是自我感覺良好</h3></div>
-        <p>自信來自於完全了解自己的優缺點並勇於表達；自欺欺人的「自我感覺良好」則無法面對事實。誠實面對自己是一門需要層次提昇的功力。</p>
-      </div>
-      <div class="core-row">
-        <div class="core-head"><div class="core-tag">進退的智慧</div><h3>進退皆在方寸之間</h3></div>
-        <p>以武術為喻，主動迎向問題往往是最好的防守。「做自己」不是橫衝直撞，而是能「以進為退」、「以退為進」，在與社會協作時依然保有清醒的主導權。</p>
-      </div>
-    </div>
+    <div class="cta-row"><span>想知道他們讀到了什麼？</span><a class="btn btn-primary" href="#buy">向出版社訂購　NT$380</a></div>
   </div>
 </section>
 
@@ -440,10 +393,10 @@ footer p{font-size:13px;color:#aaa}
         <p>誠實面對自己需要勇氣，也要提升承受壓力的水準，讓那些原本你希望做到、卻認為不可能的事情有機會被創造出來。在這樣的磨練之下，你將學會愈來愈誠實地去面對自己的人生，就會一直進步成長，也能夠更有機會接近你所認為的真實自己。這需要一個層次、一個層次的逐漸提昇，你將會發現自己有不同的面相，有無限的可能。</p>
         <p>千萬不要太悲觀的認定：「我就是這麼糟糕、我就是這麼無能……」這種負面的想法不是我們要談論的範圍。我們要討論的，是你用積極正面的態度去提昇自己的能力，不斷地朝向自己真正的方向前進。當你能夠誠實面對自己的時候，你就愈有實力去發揮自己的潛能，這也是生活裡面需要進步成長的目的。</p>
         <p>做自己，就是為了要讓生命更美好，為了能夠享受人生、實現夢想、主導自己想要的一切；當人生做到自己想要的目標，這就是一個最偉大的成功。</p>
-        <div class="sample-end">想讀完整本書，<a href="#buy">看看哪裡可以買</a>。</div>
       </div>
       <button class="collapse-toggle" type="button" aria-expanded="false" data-more="繼續讀下去" data-less="收合試讀">繼續讀下去</button>
     </div>
+    <div class="cta-row"><span>想把整本書讀完？</span><a class="btn btn-primary" href="#buy">向出版社訂購　NT$380</a></div>
   </div>
 </section>
 
@@ -476,61 +429,42 @@ footer p{font-size:13px;color:#aaa}
   </div>
 </section>
 
-<section class="section" id="editor">
-  <div class="wrap">
-    <h2 class="sec-title">編輯推薦</h2>
-    <div class="sec-sub">出版社編輯的推薦觀點</div>
-    <div class="recs">
-      <div class="rec">「做自己」三個字人人會說，卻很少有人說得清楚為什麼重要、又該怎麼做——這本書把它一步步拆解開來。</div>
-      <div class="rec">適合在人群裡漸漸找不到自己、又希望持續進步的人：它不是教你任性，而是教你拿捏進退的分寸。</div>
-      <div class="rec">書中特別花力氣破解各種關於「做自己」的迷思，讀完你會更分得清「做自己」和「只顧自己」的差別。</div>
+<section class="section" id="buy">
+  <div class="wrap buy">
+    <h2 class="sec-title">向出版社訂購</h2>
+    <div class="price">NT$380<small>定價</small></div>
+    <a class="btn btn-primary btn-lg" href="tel:0287122800">來電訂購　(02) 8712-2800</a>
+    <p class="order-line">轉帳購書：玉山銀行 808　0406-940-003763，請來電告知末五碼。<a href="https://books.hellenchentruegroup.com/purchase.html">看完整購書說明</a></p>
+    <div class="bundle">
+      <span class="bundle-tag">套書優惠</span>
+      <span>任選 3 本 <strong>NT$1,000</strong>（單本原價 380，僅限向出版社直接購買）｜《說話的藝術》全 3 冊 <strong>NT$1,100</strong></span>
     </div>
+    <p class="other-shops">也可以在網路書店購買：<a href="https://www.sanmin.com.tw/product/index/003622744" target="_blank" rel="noopener">三民書局</a>、<a href="https://www.iread.com.tw/Detail/ProdDetail/B000232344?biztype=2" target="_blank" rel="noopener">iRead 灰熊愛讀書</a>、<a href="https://www.books.com.tw/products/0010575902?loc=P_0005_009" target="_blank" rel="noopener">博客來</a>。若無現貨，歡迎直接聯絡出版社。</p>
+    <div class="share">覺得這本書適合朋友？<a href="https://social-plugins.line.me/lineit/share?url=https%3A%2F%2Fpia640210.github.io%2FBe-yourself%2F" target="_blank" rel="noopener">用 LINE 分享</a></div>
   </div>
 </section>
 
 <section class="section alt" id="author">
   <div class="wrap">
     <h2 class="sec-title">關於作者</h2>
-    <div class="sec-sub">&nbsp;</div>
     <div class="author">
       <img class="avatar" src="images/陳海倫.jpg" data-fb="https://books.hellenchentruegroup.com/images/陳海倫.jpg" onerror="this.onerror=null;this.src=this.dataset.fb" alt="陳海倫" loading="lazy">
       <div>
         <h3>陳海倫</h3>
         <div class="author-role">國際管理顧問・演講者・暢銷作家｜心橋顧問公司總裁</div>
-        <p>長年投入品格教育、企業管理、婚姻與親子教育、溝通訓練與情緒管理，擁有超過三十年的跨國經營與顧問經驗。足跡遍及日本、印度、新加坡、美國與臺灣，協助無數個人、家庭與企業，在工作、關係與人生各階段建立更清晰的方向。</p>
+        <p>長年投入品格教育、企業管理、婚姻與親子教育、溝通訓練與情緒管理，擁有超過三十年的跨國經營與顧問經驗。</p>
         <ul class="facts">
           <li><b>200+</b>亞・美・歐媒體專訪</li>
           <li><b>30+</b>年跨國顧問經驗</li>
           <li><b>30+</b>部著作</li>
         </ul>
-        <p class="extra">著作《世紀大媒婆》曾於美國最大連鎖書店 Barnes &amp; Noble 榮登多項暢銷榜首；作媒故事亦被記錄於得獎紀錄片《尋情歷險記》，於多個國際影展放映。她也曾製作並主持北美衛視《陳顧問時間》。</p>
-        <p class="personal">對她而言，寫作不只是傳遞觀念，而是一種陪伴與實踐——她最在意的，不只是讓人理解一個道理，而是真正找到自己的力量，在現實生活裡一步一步走出屬於自己的改變。</p>
+        <p class="author-more"><a href="https://books.hellenchentruegroup.com/#about">更多作者介紹</a></p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section" id="buy">
-  <div class="wrap buy">
-    <h2 class="sec-title">哪裡可以買</h2>
-    <div class="price">NT$380<small>定價</small></div>
-    <div class="buy-links">
-      <a class="buy-link" href="https://www.sanmin.com.tw/product/index/003622744" target="_blank" rel="noopener">三民書局</a>
-      <a class="buy-link" href="https://www.iread.com.tw/Detail/ProdDetail/B000232344?biztype=2" target="_blank" rel="noopener">iRead 灰熊愛讀書</a>
-      <a class="buy-link" href="https://www.books.com.tw/products/0010575902?loc=P_0005_009" target="_blank" rel="noopener">博客來</a>
-      <a class="buy-link primary" href="tel:0287122800">來電訂購 (02) 8712-2800</a>
-    </div>
-    <p class="buy-note">※ 若網路書店無現貨，歡迎直接聯絡出版社 (02) 8712-2800</p>
-    <p class="buy-note mute">轉帳購書：玉山銀行 808 · 0406-940-003763 · 請來電告知末五碼</p>
-    <div class="bundle">
-      <span class="bundle-tag">套書優惠</span>
-      <span>任選 3 本 <strong>NT$1,000</strong>（單本原價 380，僅限向出版社直接購買）。訂購請來電，或見<a href="https://books.hellenchentruegroup.com/purchase.html">購書說明</a>。</span>
-    </div>
-    <div class="share">覺得這本書適合朋友？<a href="https://social-plugins.line.me/lineit/share?url=https%3A%2F%2Fpia640210.github.io%2FBe-yourself%2F" target="_blank" rel="noopener">用 LINE 分享</a></div>
-  </div>
-</section>
-
-<section class="section alt" id="more">
+<section class="section" id="more">
   <div class="wrap">
     <h2 class="sec-title">陳海倫的其他著作</h2>
     <div class="sec-sub">如果這本書讀起來有共鳴，也許你會想接著看這幾本。</div>
@@ -551,6 +485,10 @@ footer p{font-size:13px;color:#aaa}
         <img src="images/人生必修10堂課.jpg" data-fb="https://books.hellenchentruegroup.com/images/人生必修10堂課.jpg" onerror="this.onerror=null;this.src=this.dataset.fb" alt="人生必修10堂課" loading="lazy">
         <b>人生必修10堂課</b><span>學校沒教的最重要的課</span>
       </a>
+    </div>
+    <div class="more-bundle">
+      <p><b>這本和另外兩本一起帶回家</b>：任選 3 本 NT$1,000，比單買省 NT$140（僅限向出版社直接購買）。</p>
+      <a class="btn btn-primary" href="tel:0287122800">來電訂購　(02) 8712-2800</a>
     </div>
     <p class="more-all"><a href="https://books.hellenchentruegroup.com/#books">看全部著作</a></p>
   </div>
@@ -587,7 +525,7 @@ footer p{font-size:13px;color:#aaa}
   </div>
 </footer>
 
-<a class="buy-bar hide" id="buyBar" href="#buy">買這本書　NT$380</a>
+<a class="buy-bar hide" id="buyBar" href="#buy">向出版社訂購　NT$380</a>
 
 <script>
 // 試讀、目錄的展開／收合
